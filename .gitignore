@@ -1,0 +1,23 @@
+# Secrets
+.env
+backend/.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node / frontend
+node_modules/
+dist/
+frontend/dist/
+*.tsbuildinfo
+
+# Runtime data
+backend/data/saved_searches.json
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
