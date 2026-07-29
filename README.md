@@ -67,6 +67,11 @@ npm run dev
 
 Requires Python 3.10+ and Node 18+.
 
+**Or deploy to Kubernetes:** see [`k8s/README.md`](k8s/README.md) — credentials
+go in a `Secret`, non-secret config in a `ConfigMap`, and the frontend is
+served by nginx (production build) which reverse-proxies `/api` to the
+backend Service instead of using the Vite dev server.
+
 ## Using the UI
 
 - **Index** — enter one or more indexes (comma-separated).

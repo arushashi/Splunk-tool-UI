@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: splunk-tool-config
+  namespace: peadminns
+data:
+  # --- Replace before applying ---
+  SPLUNK_HOST: "REPLACE_ME_SPLUNK_HOST"
+  FRONTEND_ORIGIN: "https://REPLACE_ME_HOST"
+
+  # --- Sensible defaults, adjust as needed ---
+  SPLUNK_PORT: "8089"
+  SPLUNK_SCHEME: "https"
+  SPLUNK_VERIFY_SSL: "true"
+  SPLUNK_LEVEL_FIELD: "log_level"
+  SPLUNK_DEFAULT_INDEXES: "1003865"
+  SPLUNK_CONNECT_TIMEOUT: "5"
+  SPLUNK_READ_TIMEOUT: "30"

@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: splunk-tool
+  namespace: peadminns
+  annotations: {}
+  # If you use cert-manager for TLS, add e.g.:
+  #   cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  # Change if your cluster's ingress controller isn't ingress-nginx
+  # (e.g. "traefik", "alb", "gce").
+  ingressClassName: nginx
+  rules:
+    - host: REPLACE_ME_HOST
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+  # Uncomment to terminate TLS at the ingress (requires a Secret named
+  # splunk-tool-tls with tls.crt/tls.key, e.g. issued by cert-manager):
+  # tls:
+  #   - hosts:
+  #       - REPLACE_ME_HOST
+  #     secretName: splunk-tool-tls

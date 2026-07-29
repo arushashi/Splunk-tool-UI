@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: splunk-tool-backend-data
+  namespace: peadminns
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: peadminns
+  labels:
+    app: splunk-tool
+    component: backend
+spec:
+  # Saved searches are stored as a JSON file on this pod's volume (see
+  # storage.py). That only stays consistent with a single writer, so keep
+  # replicas at 1 unless saved-search storage is moved to a real database.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: splunk-tool
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: splunk-tool
+        component: backend
+    spec:
+      containers:
+        - name: backend
+          image: REPLACE_ME_REGISTRY/splunk-log-viewer-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: splunk-tool-config
+            - secretRef:
+                name: splunk-credentials
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+          # /api/health depends on live Splunk connectivity, which shouldn't
+          # gate pod restarts, so probes just confirm the FastAPI process is up.
+          readinessProbe:
+            httpGet:
+              path: /docs
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /docs
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: splunk-tool-backend-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: peadminns
+  labels:
+    app: splunk-tool
+    component: backend
+spec:
+  selector:
+    app: splunk-tool
+    component: backend
+  ports:
+    - port: 8000
+      targetPort: 8000
